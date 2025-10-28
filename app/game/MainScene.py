@@ -16,7 +16,8 @@ class MainScene(Scene):
         star.set_pos(Vector2(500, 300))
 
         player = Player(8, 0.25)
-        player.set_pos(Vector2(200, 200))
+        player.set_pos(Vector2(350, 350))
+        player.velocity = Vector2(0, -0.03)
 
         self.add_child(player)
         self.add_child(star)
