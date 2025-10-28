@@ -1,4 +1,5 @@
-from pyray import BLACK, Vector2, YELLOW
+from pyray import BLACK, Vector2, YELLOW, draw_text
+from raylib.colors import WHITE
 
 from app.core.scene import Scene
 from app.model.player import Player
@@ -19,3 +20,7 @@ class MainScene(Scene):
 
         self.add_child(player)
         self.add_child(star)
+
+    def render(self):
+        super().render()
+        draw_text("Gravity", 10, 10, 21, WHITE)
