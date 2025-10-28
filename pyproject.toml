@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "app"
+version = "0.0.1"
+description = "Raygin (game engine using raylib) implementation in python"
+authors = ["Dmitry Luńow <ummo93@gmail.com>"]
+package-mode = false
+readme = "README.md"
+
+[tool.poetry.dependencies]
+raylib = "5.5.0.2"
+python = ">=3.11,<3.15"
+
+[dependency-groups]
+dev = [
+    "pyinstaller (>=6.16.0,<7.0.0)"
+]
+
+[tool.poetry.scripts]
+build = "app.build:run"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
