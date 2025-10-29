@@ -1,14 +1,11 @@
-from pyray import Color, RED, draw_circle
+from pyray import Color, RED, load_texture
 
-from app.core.actor import Actor
+from app.core.textured_actor import TexturedActor
 
 
-class Star(Actor):
+class Star(TexturedActor):
     def __init__(self, width: int, gravity: float, color: Color = RED):
-        super().__init__()
+        super().__init__(load_texture("./app/assets/star.png"), 0.25)
         self.width = width
         self.gravity = gravity
         self.color = color
-
-    def on_draw(self):
-        draw_circle(int(self.position.x), int(self.position.y), self.width, self.color)
