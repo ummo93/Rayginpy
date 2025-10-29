@@ -1,37 +1,72 @@
-from pyray import *
-from typing import Callable
-
-from app.core.node import Node
+from app.core.actor import Actor
+from pyray import RAYWHITE
+import types
 
 
 class Scene:
-    def __init__(self, name: str, background: Color = WHITE):
-        self.nodes: list[Node] = []
-        self.name = name
-        self.background = background
-        self.restart = False
+    def __init__(self):
+        self.actors = []
+        self.to_destroy = []
+        self.camera = None
+        self.name = self.__class__.__name__
 
-    def find(self, foo: Callable[[Node], bool]) -> Node|None:
-        for node in self.nodes:
-            if foo(node):
-                return node
+    # Lifecycle methods
+    def on_init(self):
+        pass
+
+    def on_update(self, dt):
+        pass
+
+    def draw_on_background(self):
+        pass
+
+    def on_draw(self):
+        pass
+
+    def before_draw(self):
+        pass
+
+    def on_destroy(self):
+        pass
+
+    def on_end_frame(self):
+        if not self.to_destroy:
+            return
+        actor = self.to_destroy.pop(0)
+        actor.on_destroy()
+        actor.scene = None
+        self.actors.remove(actor)
+
+    def find(self, predicate: types.FunctionType) -> Actor|None:
+        for actor in self.actors:
+            if predicate(actor):
+                return actor
         return None
 
-    def add_child(self, obj: Node):
-        obj._set_scene(self)
-        self.nodes.append(obj)
+    # Core methods
+    def draw_hierarchy(self):
+        for actor in self.actors:
+            actor.on_draw()
 
-    def render(self):
-        begin_drawing()
-        delta = get_frame_time()
-        clear_background(self.background)
-        for i, obj in enumerate(self.nodes):
-            obj.render(delta)
-        end_drawing()
+    def update_hierarchy(self, dt):
+        for actor in self.actors:
+            actor.on_update(dt)
+        for actor in self.actors:
+            actor.on_update_physic(dt)
 
-    def ready(self):
-        for i, obj in enumerate(self.nodes):
-            obj.ready()
+    def spawn(self, actor):
+        self.actors.append(actor)
+        actor.scene = self
+        actor.on_init()
 
-    def restart_scene(self):
-        self.restart = True
+    def remove(self, actor):
+        self.to_destroy.append(actor)
+
+    def get_camera(self):
+        return self.camera
+
+    def add_camera(self, camera2d):
+        self.camera = camera2d
+
+    def get_background_color(self):
+        return RAYWHITE

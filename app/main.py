@@ -1,21 +1,20 @@
-from asyncio import sleep
-import asyncio
-from app.core.scene import *
-from app.game.MainScene import MainScene
+from raylib import FLAG_WINDOW_ALWAYS_RUN, FLAG_WINDOW_RESIZABLE, FLAG_VSYNC_HINT
+
+from app.core.raylib_game import RaylibGame
+from app.game.main_scene import MainScene
 
 
-
-async def main(width: int, height: int, current_scene: Scene):
-    init_window(width, height, current_scene.name)
-    current_scene.ready()
-    while not window_should_close():
-        current_scene.render()
-        await sleep(0)
-        if current_scene.restart:
-            current_scene = MainScene()
-            current_scene.ready()
-    close_window()
+class Settings:
+    def __init__(self):
+        self.width = 800
+        self.height = 600
+        self.title = "Raygin Python".encode()
+        self.target_fps = 60
+        self.window_flags = FLAG_WINDOW_ALWAYS_RUN | FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT
 
 
 if __name__ == '__main__':
-    asyncio.run(main(800, 600, MainScene()))
+    settings = Settings()
+    game = RaylibGame(settings, MainScene())
+    game.init()
+    game.start_game_loop()
