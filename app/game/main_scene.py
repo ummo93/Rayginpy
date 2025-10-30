@@ -1,23 +1,23 @@
 from app.core.scene import Scene
-from pyray import Vector2, YELLOW, BLACK, WHITE, Camera2D, draw_text, vector2_distance
+from pyray import Vector2, BLACK, WHITE, Camera2D, draw_text, vector2_distance
 
 from app.game.player import Player
 from app.game.star import Star
 
 
 class MainScene(Scene):
+    star = None
+    player = None
+
     def __init__(self):
         super().__init__()
-        self.star = None
-        self.player = None
 
     def on_init(self):
-        self.star = Star(15, 5, YELLOW)
-        self.player = Player(8, 5)
-        self.player.velocity = Vector2(0, -5)
+        self.star = Star(15, WHITE)
+        self.player = Player(4, 15)
         self.star.set_position(Vector2(350, 350))
-        self.player.set_position(Vector2(200, 350))
-
+        self.player.set_position(Vector2(350, 450))
+        self.player.velocity = Vector2(-1, 0)
         self.spawn(self.star)
         self.spawn(self.player)
 

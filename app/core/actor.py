@@ -2,14 +2,12 @@ from pyray import Vector2, vector2_add
 from math import cos, sin, radians
 
 
-_id_counter = 0
-
 class Actor:
+    __id_counter = 0
 
     def __init__(self, position=Vector2(0, 0), rotation=Vector2(0, 0)):
-        global _id_counter
-        _id_counter += 1
-        self.id = _id_counter
+        Actor.__id_counter += 1
+        self.id = Actor.__id_counter
         self.position = position
         self.rotation = rotation
         self.collider = None

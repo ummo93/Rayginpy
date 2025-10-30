@@ -1,45 +1,57 @@
-from raylib.defines import GLFW_KEY_W, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_S
+from raylib.defines import GLFW_KEY_W, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_S, RL_LINES
 
 from app.core.actor import Actor
-from pyray import RED, Vector2, is_key_down, vector2_normalize, vector2_scale, vector2_add, vector2_clamp_value, vector2_subtract, draw_circle
+from pyray import RED, GRAY, Vector2, is_key_down, vector2_normalize, vector2_scale, vector2_add, \
+    vector2_subtract, draw_circle_v, vector2_distance_sqr, rl_begin, rl_color4ub, rl_vertex2f, rl_end, Color
 
+from app.core.utils import draw_lines_batch
 from app.game.star import Star
 
 
 class Player(Actor):
+    trajectory: list[tuple[float, float]] = []
+    orbit_color: Color = Color(GRAY[0], GRAY[1], GRAY[2], GRAY[3])
+
     def __init__(self, width, speed):
         super().__init__()
         self.width = width
         self.speed = speed
         self.velocity = Vector2(0, 0)
         self.gravity_center = Vector2(0, 0)
-        self.gravity_value = 0
 
 
     def on_init(self):
         star = self.scene.find(lambda node: isinstance(node, Star))
         self.gravity_center = star.position
-        self.gravity_value = star.gravity
+        self.trajectory.clear()
 
     def on_update(self, delta: float):
         move_vector = Vector2(0, 0)
         if is_key_down(GLFW_KEY_W):
-            move_vector.y = -self.speed * delta
+            move_vector.y = -self.speed
         if is_key_down(GLFW_KEY_S):
-            move_vector.y = self.speed * delta
+            move_vector.y = self.speed
         if is_key_down(GLFW_KEY_A):
-            move_vector.x = -self.speed * delta
+            move_vector.x = -self.speed
         if is_key_down(GLFW_KEY_D):
-            move_vector.x = self.speed * delta
+            move_vector.x = self.speed
 
+        heading = vector2_normalize(vector2_subtract(self.gravity_center, self.position))
+        distance_sqr = vector2_distance_sqr(self.gravity_center, self.position)
 
-        gravity = vector2_scale(vector2_normalize(vector2_subtract(self.gravity_center, self.position)), self.gravity_value*delta)
-        self.velocity = vector2_add(self.velocity, gravity)
-        self.velocity = vector2_add(self.velocity, move_vector)
+        gravity = vector2_scale(heading, 1/distance_sqr)
+        self.velocity = vector2_add(self.velocity, vector2_scale(gravity, delta*1e4))
+        self.velocity = vector2_add(self.velocity, vector2_scale(move_vector, delta))
 
         # restriction on max speed
-        self.velocity = vector2_clamp_value(self.velocity, 0, 3)
         self.position = vector2_add(self.position, self.velocity)
 
+        if len(Player.trajectory) > 100:
+            Player.trajectory.pop(0)
+
+        Player.trajectory.append((self.position.x, self.position.y))
+
+
     def on_draw(self):
-        draw_circle(int(self.position.x), int(self.position.y), self.width, RED)
+        draw_circle_v(self.position, self.width, RED)
+        draw_lines_batch(Player.trajectory, self.orbit_color, True, 10)
