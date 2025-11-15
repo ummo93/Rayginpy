@@ -1,8 +1,8 @@
-from raylib.defines import GLFW_KEY_W, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_S, RL_LINES
+from raylib.defines import GLFW_KEY_W, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_S
 
 from app.core.actor import Actor
 from pyray import RED, GRAY, Vector2, is_key_down, vector2_normalize, vector2_scale, vector2_add, \
-    vector2_subtract, draw_circle_v, vector2_distance_sqr, rl_begin, rl_color4ub, rl_vertex2f, rl_end, Color
+    vector2_subtract, draw_circle_v, vector2_distance_sqr, Color
 
 from app.core.utils import draw_lines_batch
 from app.game.star import Star
@@ -40,7 +40,7 @@ class Player(Actor):
         distance_sqr = vector2_distance_sqr(self.gravity_center, self.position)
 
         gravity = vector2_scale(heading, 1/distance_sqr)
-        self.velocity = vector2_add(self.velocity, vector2_scale(gravity, delta*1e4))
+        self.velocity = vector2_add(self.velocity, vector2_scale(gravity, delta*1e5))
         self.velocity = vector2_add(self.velocity, vector2_scale(move_vector, delta))
 
         # restriction on max speed
@@ -54,4 +54,4 @@ class Player(Actor):
 
     def on_draw(self):
         draw_circle_v(self.position, self.width, RED)
-        draw_lines_batch(Player.trajectory, self.orbit_color, True, 10)
+        draw_lines_batch(Player.trajectory, self.orbit_color, True, 5, 2)

@@ -17,7 +17,7 @@ class MainScene(Scene):
         self.player = Player(4, 15)
         self.star.set_position(Vector2(350, 350))
         self.player.set_position(Vector2(350, 450))
-        self.player.velocity = Vector2(-1, 0)
+        self.player.velocity = Vector2(-4, 0)
         self.spawn(self.star)
         self.spawn(self.player)
 
