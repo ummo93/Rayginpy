@@ -1,5 +1,5 @@
 from app.core.scene import Scene
-from pyray import Vector2, BLACK, WHITE, Camera2D, draw_text, vector2_distance
+from pyray import Vector2, BLACK, WHITE, Camera2D, draw_text, vector2_distance, get_screen_width, get_screen_height
 
 from app.game.player import Player
 from app.game.star import Star
@@ -22,8 +22,6 @@ class MainScene(Scene):
         self.spawn(self.player)
 
         camera = Camera2D()
-        camera.target = self.star.position
-        camera.offset = Vector2(400, 300)
         camera.zoom = 1.5
 
         self.add_camera(camera)
@@ -35,6 +33,8 @@ class MainScene(Scene):
         draw_text("Gravity", 10, 10, 21, WHITE)
 
     def on_update(self, dt):
+        self.camera.target = self.star.position
+        self.camera.offset = Vector2(get_screen_width()/2, get_screen_height()/2)
         if vector2_distance(self.player.position, self.player.gravity_center) < 15:
             self.remove(self.player)
             self.remove(self.star)

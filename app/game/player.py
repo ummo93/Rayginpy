@@ -2,9 +2,8 @@ from raylib.defines import GLFW_KEY_W, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_S
 
 from app.core.actor import Actor
 from pyray import RED, GRAY, Vector2, is_key_down, vector2_normalize, vector2_scale, vector2_add, \
-    vector2_subtract, draw_circle_v, vector2_distance_sqr, Color
+    vector2_subtract, draw_circle_v, vector2_distance_sqr, draw_line_ex, Color
 
-from app.core.utils import draw_lines_batch
 from app.game.star import Star
 
 
@@ -52,6 +51,18 @@ class Player(Actor):
         Player.trajectory.append((self.position.x, self.position.y))
 
 
+    def draw_orbit(self):
+        if len(Player.trajectory) == 0: return
+        a_max = self.orbit_color.a
+        a_cur = 0
+        for (i, (x, y)) in enumerate(Player.trajectory):
+            a_cur += 5 if a_cur < a_max else 0
+            if a_cur > a_max: a_cur = a_max
+            if i != 0:
+                (end_pos_x, end_pos_y) = (Player.trajectory[i-1][0], Player.trajectory[i-1][1])
+                color = (self.orbit_color.r, self.orbit_color.g, self.orbit_color.b, a_cur)
+                draw_line_ex(Vector2(x, y), Vector2(end_pos_x, end_pos_y), 1, color)
+
     def on_draw(self):
+        self.draw_orbit()
         draw_circle_v(self.position, self.width, RED)
-        draw_lines_batch(Player.trajectory, self.orbit_color, True, 5, 2)

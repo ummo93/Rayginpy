@@ -1,5 +1,5 @@
 from app.core.actor import Actor
-from pyray import RAYWHITE
+from pyray import RAYWHITE, Camera2D
 import types
 
 
@@ -7,7 +7,7 @@ class Scene:
     def __init__(self):
         self.actors = []
         self.to_destroy = []
-        self.camera = None
+        self.camera: Camera2D|None = None
         self.name = self.__class__.__name__
 
     # Lifecycle methods
