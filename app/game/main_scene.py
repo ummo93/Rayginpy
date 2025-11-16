@@ -1,5 +1,4 @@
 import random
-from asyncio import sleep
 
 from app.core.scene import Scene
 from pyray import Vector2, BLACK, WHITE, ORANGE, Camera2D, draw_text, vector2_distance, get_screen_width, \
@@ -7,12 +6,14 @@ from pyray import Vector2, BLACK, WHITE, ORANGE, Camera2D, draw_text, vector2_di
     get_world_to_screen_2d, load_texture, draw_texture, draw_texture_ex
 
 from app.core.textured_actor import TexturedActor
+from app.core.utils import midpoint
 from app.game.player import Player
 from app.game.star import Star
-import asyncio
+
 
 class MainScene(Scene):
     star = None
+    star2 = None
     player = None
     background = None
 
@@ -21,8 +22,10 @@ class MainScene(Scene):
 
     def on_init(self):
         self.star = Star(15, WHITE)
+        self.star2 = Star(15, WHITE)
         self.player = Player(4, 15)
         self.star.set_position(Vector2(350, 350))
+        self.star2.set_position(Vector2(500, 400))
         self.player.set_position(Vector2(350, 450))
         self.background = TexturedActor(load_texture("assets/background.png"), 0.4, ORANGE, Vector2(350, 350), Vector2(0, 0))
 
@@ -31,6 +34,7 @@ class MainScene(Scene):
 
         self.add_camera(camera)
         self.spawn(self.star)
+        self.spawn(self.star2)
         self.spawn(self.player)
         self.spawn(self.background)
 
@@ -43,7 +47,7 @@ class MainScene(Scene):
         draw_text("Gravity", 10, 10, 21, WHITE)
 
     def on_update(self, dt):
-        self.camera.target = self.star.position
+        self.camera.target = midpoint(self.star.position, self.star2.position)
         self.camera.offset = Vector2(get_screen_width()/2, get_screen_height()/2)
         if self.is_game_over:
             self.remove_all()
@@ -51,7 +55,7 @@ class MainScene(Scene):
 
     @property
     def is_game_over(self) -> bool:
-        if vector2_distance(self.player.position, self.player.gravity_center) < 15:
+        if vector2_distance(self.player.position, self.player.gravity_center.position) < 15:
             return True
 
         if self.camera is None:

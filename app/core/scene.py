@@ -43,6 +43,9 @@ class Scene:
                 return actor
         return None
 
+    def find_all(self, predicate: types.FunctionType) -> list[Actor]:
+        return [actor for actor in self.actors if predicate(actor)]
+
     # Core methods
     def draw_hierarchy(self):
         for actor in self.actors:

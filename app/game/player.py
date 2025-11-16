@@ -2,7 +2,7 @@ from raylib.defines import GLFW_KEY_W, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_S
 
 from app.core.actor import Actor
 from pyray import RED, GRAY, Vector2, is_key_down, vector2_normalize, vector2_scale, vector2_add, \
-    vector2_subtract, draw_circle_v, vector2_distance_sqr, draw_line_ex, Color
+    vector2_subtract, draw_circle_v, vector2_distance_sqr, draw_line_ex, Color, vector2_distance
 
 from app.game.star import Star
 
@@ -10,21 +10,27 @@ from app.game.star import Star
 class Player(Actor):
     trajectory: list[tuple[float, float]] = []
     orbit_color: Color = Color(GRAY[0], GRAY[1], GRAY[2], GRAY[3])
+    gravity_sources: [Star] = []
+    gravity_center: Star = None
 
     def __init__(self, width, speed):
         super().__init__()
         self.width = width
         self.speed = speed
         self.velocity = Vector2(0, 0)
-        self.gravity_center = Vector2(0, 0)
 
 
     def on_init(self):
-        star = self.scene.find(lambda node: isinstance(node, Star))
-        self.gravity_center = star.position
         self.trajectory.clear()
+        self.gravity_sources = self.scene.find_all(lambda actor: isinstance(actor, Star) )
+        self.closest_gravity_center_calc()
+
+    def closest_gravity_center_calc(self):
+        self.gravity_center = min(self.gravity_sources, key=lambda obj: vector2_distance(obj.position, self.position))
 
     def on_update(self, delta: float):
+        self.closest_gravity_center_calc()
+
         move_vector = Vector2(0, 0)
         if is_key_down(GLFW_KEY_W):
             move_vector.y = -self.speed
@@ -35,8 +41,8 @@ class Player(Actor):
         if is_key_down(GLFW_KEY_D):
             move_vector.x = self.speed
 
-        heading = vector2_normalize(vector2_subtract(self.gravity_center, self.position))
-        distance_sqr = vector2_distance_sqr(self.gravity_center, self.position)
+        heading = vector2_normalize(vector2_subtract(self.gravity_center.position, self.position))
+        distance_sqr = vector2_distance_sqr(self.gravity_center.position, self.position)
 
         gravity = vector2_scale(heading, 1/distance_sqr)
         self.velocity = vector2_add(self.velocity, vector2_scale(gravity, delta*1e5))
