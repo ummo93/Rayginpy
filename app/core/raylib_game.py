@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 from app.core.context import GameContext
 from pyray import *
 
@@ -12,20 +14,21 @@ class RaylibGame:
         self.ctx.window_width = get_screen_width()
         self.ctx.window_height = get_screen_height()
         self.ctx.fps = get_fps()
-        self.ctx.delta = get_frame_time()
+        self.ctx.delta = min(get_frame_time(), 1/self.settings.target_fps)
 
     def init(self):
+        set_config_flags(self.settings.window_flags)
         init_window(self.settings.width, self.settings.height, self.settings.title)
-        set_window_state(self.settings.window_flags)
         set_target_fps(self.settings.target_fps)
         init_audio_device()
         self.refresh_context()
 
-    def start_game_loop(self):
+    async def start_game_loop(self):
         self.running = True
         self.scene.on_init()
 
         while not window_should_close():
+            await sleep(0)
             self.refresh_context()
             self.scene.update_hierarchy(self.ctx.delta)
             self.scene.on_update(self.ctx.delta)

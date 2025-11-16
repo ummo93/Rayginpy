@@ -53,10 +53,11 @@ class Player(Actor):
 
     def draw_orbit(self):
         if len(Player.trajectory) == 0: return
+        fade_strength = 3
         a_max = self.orbit_color.a
         a_cur = 0
         for (i, (x, y)) in enumerate(Player.trajectory):
-            a_cur += 5 if a_cur < a_max else 0
+            a_cur += fade_strength if a_cur < a_max else 0
             if a_cur > a_max: a_cur = a_max
             if i != 0:
                 (end_pos_x, end_pos_y) = (Player.trajectory[i-1][0], Player.trajectory[i-1][1])

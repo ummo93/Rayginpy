@@ -62,6 +62,9 @@ class Scene:
     def remove(self, actor):
         self.to_destroy.append(actor)
 
+    def remove_all(self):
+        self.to_destroy.extend(self.actors)
+
     def get_camera(self):
         return self.camera
 
