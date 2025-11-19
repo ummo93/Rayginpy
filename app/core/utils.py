@@ -1,3 +1,5 @@
+from functools import reduce
+
 from pyray import Color, rl_begin, rl_vertex2f, rl_color4ub, rl_end, Vector2
 from raylib.defines import RL_LINES
 
@@ -17,6 +19,7 @@ def draw_lines_batch(segments: list[tuple[float, float]], color: Color, fade: bo
     rl_end()
 
 
-
-def midpoint(a: Vector2, b: Vector2) -> Vector2:
-    return Vector2((a.x + b.x) / 2, (a.y + b.y) / 2)
+def midpoint(*args: Vector2) -> Vector2:
+    xs = reduce(lambda a, b: a.x + b.x, args)
+    ys = reduce(lambda a, b: a.y + b.y, args)
+    return Vector2(xs / 2, ys / 2)

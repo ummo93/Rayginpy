@@ -2,8 +2,7 @@ import random
 
 from app.core.scene import Scene
 from pyray import Vector2, BLACK, WHITE, ORANGE, Camera2D, draw_text, vector2_distance, get_screen_width, \
-    get_screen_height, \
-    get_world_to_screen_2d, load_texture, draw_texture, draw_texture_ex
+    get_screen_height, get_world_to_screen_2d, load_texture
 
 from app.core.textured_actor import TexturedActor
 from app.core.utils import midpoint
@@ -17,17 +16,27 @@ class MainScene(Scene):
     player = None
     background = None
 
+    star_pos_on_init = Vector2(350, 350)
+    star2_pos_on_init = Vector2(800, 400)
+
     def __init__(self):
         super().__init__()
 
     def on_init(self):
         self.star = Star(15, WHITE)
         self.star2 = Star(15, WHITE)
-        self.player = Player(4, 15)
-        self.star.set_position(Vector2(350, 350))
-        self.star2.set_position(Vector2(500, 400))
-        self.player.set_position(Vector2(350, 450))
-        self.background = TexturedActor(load_texture("assets/background.png"), 0.4, ORANGE, Vector2(350, 350), Vector2(0, 0))
+        self.player = Player(4, 25)
+        self.star.set_position(self.star_pos_on_init)
+        self.star2.set_position(self.star2_pos_on_init)
+
+        mid = midpoint(self.star.position, self.star2.position)
+
+        if vector2_distance(mid, self.star.position) < 10:
+            self.player.set_position(Vector2(mid.x + random.randrange(-200, 200), mid.y + random.randrange(-200, 200)))
+        else:
+            self.player.set_position(Vector2(mid.x, mid.y))
+
+        self.background = TexturedActor(load_texture("assets/background.png"), 0.4, ORANGE, Vector2(mid.x, mid.y), Vector2(0, 0))
 
         camera = Camera2D()
         camera.zoom = 1.5
@@ -46,16 +55,22 @@ class MainScene(Scene):
     def on_draw(self):
         draw_text("Gravity", 10, 10, 21, WHITE)
 
-    def on_update(self, dt):
-        self.camera.target = midpoint(self.star.position, self.star2.position)
+    def on_update(self, dt: float):
+        mid = midpoint(self.star.position, self.star2.position)
+        self.camera.target = mid
+        mid_screen = get_world_to_screen_2d(mid, self.camera)
+        draw_text("x", int(mid_screen.x), int(mid_screen.y), 25, WHITE)
         self.camera.offset = Vector2(get_screen_width()/2, get_screen_height()/2)
         if self.is_game_over:
+            self.star_pos_on_init = self.star.position
+            self.star2_pos_on_init = self.star2.position
             self.remove_all()
             self.on_init()
 
     @property
     def is_game_over(self) -> bool:
-        if vector2_distance(self.player.position, self.player.gravity_center.position) < 15:
+        fall_star = self.find_all(lambda actor: isinstance(actor, Star) and vector2_distance(actor.position, self.player.position) < 15)
+        if len(fall_star) > 0:
             return True
 
         if self.camera is None:

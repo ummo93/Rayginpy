@@ -1,10 +1,22 @@
+from dataclasses import dataclass
 from asyncio import sleep
 
 from app.core.context import GameContext
 from pyray import *
 
+from app.core.scene import Scene
+
+@dataclass
+class GameSettings:
+    width: int = 800
+    height: int = 600
+    title: str = "Title"
+    target_fps: int = 60
+    window_flags: ConfigFlags = ConfigFlags.FLAG_FULLSCREEN_MODE
+
+
 class RaylibGame:
-    def __init__(self, settings, scene):
+    def __init__(self, settings: GameSettings, scene: Scene):
         self.settings = settings
         self.ctx = GameContext()
         self.scene = scene

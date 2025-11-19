@@ -1,16 +1,21 @@
-from raylib import FLAG_WINDOW_RESIZABLE, FLAG_VSYNC_HINT, FLAG_WINDOW_ALWAYS_RUN
+from dataclasses import dataclass
+
+from pyray import get_screen_width, get_screen_height
 import asyncio
-from app.core.raylib_game import RaylibGame
+
+from raylib.enums import ConfigFlags
+
+from app.core.raylib_game import RaylibGame, GameSettings
 from app.game.main_scene import MainScene
 
-
-class Settings:
-    def __init__(self):
-        self.width = 800
-        self.height = 600
-        self.title = "Raygin Python".encode()
-        self.target_fps = 60
-        self.window_flags = FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT | FLAG_WINDOW_ALWAYS_RUN
+@dataclass
+class Settings(GameSettings):
+    width: int = get_screen_width()
+    height: int = get_screen_height()
+    title: str = "Raygin Python"
+    window_flags: ConfigFlags = ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_VSYNC_HINT | \
+                                ConfigFlags.FLAG_FULLSCREEN_MODE | ConfigFlags.FLAG_WINDOW_ALWAYS_RUN | \
+                                ConfigFlags.FLAG_BORDERLESS_WINDOWED_MODE
 
 
 if __name__ == '__main__':
