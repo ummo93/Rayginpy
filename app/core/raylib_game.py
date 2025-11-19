@@ -6,7 +6,7 @@ from pyray import *
 
 from app.core.scene import Scene
 
-@dataclass
+@dataclass(frozen=True)
 class GameSettings:
     width: int = 800
     height: int = 600
